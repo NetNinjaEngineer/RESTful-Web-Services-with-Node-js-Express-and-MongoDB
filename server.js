@@ -1,7 +1,12 @@
 const express = require('express')
+const path = require('path')
+
 const app = express()
 
-const port = process.env.PORT || 3000
+app.use(express.urlencoded({ extended: true }))
+
+
+const port = process.env.PORT || 5000
 
 const students = [
   { id: 100, firstName: "Mohamed", lastName: "Ehab", department: "CS" },
@@ -11,8 +16,21 @@ const students = [
   { id: 104, firstName: "Sayed", lastName: "Samy", department: "CS" },
 ];
 
-app.get('/', (req, res) => {
-  res.send("Hello Mohamed ")
+app.get('/', (request, response) => {
+  response.sendFile(path.join(__dirname, "/main.html"))
+})
+
+app.get('/welcome.html', (request, response) => {
+  console.log(request.query)
+  response.send("Welcome Dear Guest")
+
+})
+
+app.post('/welcome.html', (request, response) => {
+  console.log(request.query)
+  console.log(request.body)
+
+  response.send(`Thanks ${request.body.fname} ${request.body.lname} for Submiting form data...`)
 })
 
 
@@ -25,8 +43,13 @@ app.get('/api/students', (req, res) => {
 
 app.get('/api/students/:id', (req, res) => {
   let studentId = parseInt(req.params.id);
-  let student = students.find((value, index, obj) => { return value.id === studentId });
-  res.json(student)
+  // let student = students.find((value, index, obj) => { return value.id === studentId });
+  let filteredStudent = students.find(student => student.id === studentId);
+
+  if (filteredStudent != null) {
+    res.json(filteredStudent)
+  } else
+    res.send("Not Founded...")
 
 })
 
